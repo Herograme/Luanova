@@ -1,0 +1,31 @@
+function functionName(params) type
+end
+
+class className
+    function classVoid()
+    end
+
+    function classMethod() type
+    end
+end
+
+local testing = ""
+local testing = 0
+
+for k, v in ipairs(testing)
+
+end
+
+if 1 == 1 then
+
+end
+
+// Comment
+
+/* Comment Block */
+
+while True do
+
+end
+
+testing()

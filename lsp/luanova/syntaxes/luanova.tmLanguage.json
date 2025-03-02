@@ -1,0 +1,118 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Lua Nova",
+	"scopeName": "source.luanova",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#functions"
+		},
+		{
+			"include": "#booleans"
+		},
+		{
+			"include": "#classes"
+		},
+		{
+			"include": "#variables"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	"repository": {
+		"booleans": {
+			"patterns": [
+				{
+					"name": "constant.language.boolean.luanova",
+					"match": "\\b(true|false)\\b"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.luanova",
+					"match": "\\b(function|class|end|local|for|in|if|then|while|do)\\b"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"comment": "Nomes de funções",
+					"match": "(?<=\\bfunction\\s)\\w+",
+					"name": "entity.name.function.luanova"
+				},
+				{
+					"comment": "Chamadas de função",
+					"match": "\\b\\w+(?=\\()",
+					"name": "support.function.luanova"
+				}
+			]
+		},
+		"classes": {
+			"patterns": [
+				{
+					"comment": "Nomes de classes",
+					"match": "(?<=\\bclass\\s)\\w+",
+					"name": "entity.name.class.luanova"
+				}
+			]
+		},
+		"variables": {
+			"patterns": [
+				{
+					"comment": "Variáveis locais",
+					"match": "(?<=\\blocal\\s)\\w+",
+					"name": "variable.other.readwrite.luanova"
+				},
+				{
+					"comment": "Parâmetros (ex: params, k, v)",
+					"match": "\\b(params|k|v|testing)\\b",
+					"name": "variable.parameter.luanova"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.luanova",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.luanova",
+					"match": "\\\\."
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.luanova",
+					"match": "\\b\\d+\\b"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.luanova",
+					"match": "//.*"
+				},
+				{
+					"name": "comment.block.luanova",
+					"begin": "/\\*",
+					"end": "\\*/"
+				}
+			]
+		}
+	}
+}
