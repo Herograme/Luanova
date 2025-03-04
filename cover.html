@@ -1,0 +1,545 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>luanova: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/Herograme/LuaNova/luanova/lexer.go (95.5%)</option>
+				
+				<option value="file1">github.com/Herograme/LuaNova/luanova/token_string.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package luanova
+
+import "unicode"
+
+type Token struct {
+        Type    int
+        Literal string
+}
+
+type Lexer struct {
+        input   string
+        pos     int
+        readPos int
+        ch      byte
+}
+
+func NewLexer(input string) *Lexer <span class="cov8" title="1">{
+        l := &amp;Lexer{input: input}
+        l.readChar()
+        return l
+}</span>
+
+func (l *Lexer) readChar() <span class="cov8" title="1">{
+        if l.readPos &gt;= len(l.input) </span><span class="cov8" title="1">{
+                l.ch = 0
+        }</span> else<span class="cov8" title="1"> {
+                l.ch = l.input[l.readPos]
+        }</span>
+        <span class="cov8" title="1">l.pos = l.readPos
+        l.readPos++</span>
+}
+
+func (l *Lexer) peekChar() byte <span class="cov8" title="1">{
+        if l.readPos &gt;= len(l.input) </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">return l.input[l.readPos]</span>
+}
+
+func (l *Lexer) NextToken() Token <span class="cov8" title="1">{
+        var tok Token
+
+        l.skipWhitespace()
+
+        switch l.ch </span>{
+        case '+':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: PlusAssign, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Plus, Literal: string(l.ch)}
+                }</span>
+        case '-':<span class="cov8" title="1">
+                switch l.peekChar() </span>{
+                case '=':<span class="cov8" title="1">
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: SubAssign, Literal: string(ch) + string(l.ch)}</span>
+                case '&gt;':<span class="cov8" title="1">
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: Arrow, Literal: string(ch) + string(l.ch)}</span>
+                case '-':<span class="cov8" title="1">
+                        tok.Type = Comment
+                        tok.Literal = l.readLineComment()
+                        return tok</span>
+                case '*':<span class="cov8" title="1">
+                        tok.Type = CommentBlock
+                        tok.Literal = l.readBlockComment()
+                        return tok</span>
+                default:<span class="cov8" title="1">
+                        tok = Token{Type: Sub, Literal: string(l.ch)}</span>
+                }
+        case '*':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: MultiAssign, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Multi, Literal: string(l.ch)}
+                }</span>
+        case '/':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: DivAssign, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Div, Literal: string(l.ch)}
+                }</span>
+        case '%':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: ModAssign, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Mod, Literal: string(l.ch)}
+                }</span>
+        case '^':<span class="cov8" title="1">
+                tok = Token{Type: Po, Literal: string(l.ch)}</span>
+        case '.':<span class="cov8" title="1">
+                if l.peekChar() == '.' </span><span class="cov8" title="1">{
+                        l.readChar()
+                        if l.peekChar() == '.' </span><span class="cov8" title="1">{
+                                l.readChar()
+                                tok = Token{Type: Dots, Literal: "..."}
+                        }</span> else<span class="cov8" title="1"> {
+                                tok = Token{Type: Concat, Literal: ".."}
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        tok = Token{Type: Dot, Literal: string(l.ch)}
+                }</span>
+        case '=':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: Equal, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Assign, Literal: string(l.ch)}
+                }</span>
+
+        case '~':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: NotEqual, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov0" title="0"> {
+                        tok = Token{Type: Illegal, Literal: string(l.ch)}
+                }</span>
+        case '&lt;':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: LessEqual, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Less, Literal: string(l.ch)}
+                }</span>
+        case '&gt;':<span class="cov8" title="1">
+                if l.peekChar() == '=' </span><span class="cov8" title="1">{
+                        ch := l.ch
+                        l.readChar()
+                        tok = Token{Type: GreaterEqual, Literal: string(ch) + string(l.ch)}
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Greater, Literal: string(l.ch)}
+                }</span>
+        case '(':<span class="cov8" title="1">
+                tok = Token{Type: LParen, Literal: string(l.ch)}</span>
+        case ')':<span class="cov8" title="1">
+                tok = Token{Type: RParen, Literal: string(l.ch)}</span>
+        case '{':<span class="cov8" title="1">
+                tok = Token{Type: LBrace, Literal: string(l.ch)}</span>
+        case '}':<span class="cov8" title="1">
+                tok = Token{Type: RBrace, Literal: string(l.ch)}</span>
+        case '[':<span class="cov8" title="1">
+                tok = Token{Type: LBrack, Literal: string(l.ch)}</span>
+        case ']':<span class="cov8" title="1">
+                tok = Token{Type: RBrack, Literal: string(l.ch)}</span>
+        case ',':<span class="cov8" title="1">
+                tok = Token{Type: Comma, Literal: string(l.ch)}</span>
+        case ':':<span class="cov8" title="1">
+                tok = Token{Type: Colom, Literal: string(l.ch)}</span>
+        case ';':<span class="cov0" title="0">
+                tok = Token{Type: Semi, Literal: string(l.ch)}</span>
+        case '"':<span class="cov8" title="1">
+                tok = Token{Type: StringDelim, Literal: l.readString()}</span>
+        case '?':<span class="cov8" title="1">
+                tok = Token{Type: Question, Literal: string(l.ch)}</span>
+        case 0:<span class="cov8" title="1">
+                tok.Literal = ""
+                tok.Type = EOF</span>
+        default:<span class="cov8" title="1">
+                if isLetter(l.ch) </span><span class="cov8" title="1">{
+                        literal := l.readIdentifier()
+                        tok.Type = LookupIdent(literal)
+                        tok.Literal = literal
+                        return tok
+                }</span> else<span class="cov8" title="1"> if isDigit(l.ch) </span><span class="cov8" title="1">{
+                        literal := l.readNumber()
+                        tok.Literal = literal
+                        tok.Type = Literal
+                        return tok
+                }</span> else<span class="cov8" title="1"> {
+                        tok = Token{Type: Illegal, Literal: string(l.ch)}
+                }</span>
+        }
+
+        <span class="cov8" title="1">l.readChar()
+        return tok</span>
+}
+
+func (l *Lexer) skipWhitespace() <span class="cov8" title="1">{
+        for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' </span><span class="cov8" title="1">{
+                l.readChar()
+        }</span>
+}
+
+func (l *Lexer) readIdentifier() string <span class="cov8" title="1">{
+        start := l.pos
+        for isLetter(l.ch) || isDigit(l.ch) </span><span class="cov8" title="1">{
+                l.readChar()
+        }</span>
+        <span class="cov8" title="1">return l.input[start:l.pos]</span>
+}
+func (l *Lexer) readLineComment() string <span class="cov8" title="1">{
+        start := l.pos
+        for l.ch != '\n' &amp;&amp; l.ch != 0 </span><span class="cov8" title="1">{
+                l.readChar()
+        }</span>
+        <span class="cov8" title="1">return l.input[start:l.pos]</span>
+}
+
+func isLetter(ch byte) bool <span class="cov8" title="1">{
+        return unicode.IsLetter(rune(ch)) || ch == '_'
+}</span>
+
+func isDigit(ch byte) bool <span class="cov8" title="1">{
+        return '0' &lt;= ch &amp;&amp; ch &lt;= '9'
+}</span>
+
+func LookupIdent(ident string) int <span class="cov8" title="1">{
+        var token int
+        switch ident </span>{
+        case "function":<span class="cov8" title="1">
+                token = Function</span>
+        case "local":<span class="cov8" title="1">
+                token = Local</span>
+        case "if":<span class="cov8" title="1">
+                token = If</span>
+        case "else":<span class="cov0" title="0">
+                token = Else</span>
+        case "elseif":<span class="cov8" title="1">
+                token = ElseIf</span>
+        case "and":<span class="cov8" title="1">
+                token = And</span>
+        case "or":<span class="cov8" title="1">
+                token = Or</span>
+        case "not":<span class="cov0" title="0">
+                token = Not</span>
+        case "while":<span class="cov8" title="1">
+                token = While</span>
+        case "for":<span class="cov8" title="1">
+                token = For</span>
+        case "return":<span class="cov8" title="1">
+                token = Return</span>
+        case "break":<span class="cov8" title="1">
+                token = Break</span>
+        case "continue":<span class="cov8" title="1">
+                token = Continue</span>
+        case "true":<span class="cov8" title="1">
+                token = True</span>
+        case "false":<span class="cov8" title="1">
+                token = False</span>
+        case "do":<span class="cov8" title="1">
+                token = Do</span>
+        case "in":<span class="cov0" title="0">
+                token = In</span>
+        case "then":<span class="cov8" title="1">
+                token = Then</span>
+        case "end":<span class="cov8" title="1">
+                token = End</span>
+
+        default:<span class="cov8" title="1">
+                token = Literal</span>
+        }
+
+        <span class="cov8" title="1">return token</span>
+}
+
+func (l *Lexer) readString() string <span class="cov8" title="1">{
+        l.readChar()
+        start := l.pos
+        for l.ch != '"' &amp;&amp; l.ch != 0 </span><span class="cov8" title="1">{
+                l.readChar()
+        }</span>
+        <span class="cov8" title="1">return l.input[start:l.pos]</span>
+}
+
+func (l *Lexer) readBlockComment() string <span class="cov8" title="1">{
+        start := l.pos - 1
+        l.readChar()
+
+        for </span><span class="cov8" title="1">{
+                if l.ch == '*' &amp;&amp; l.peekChar() == '-' </span><span class="cov8" title="1">{
+                        l.readChar()
+                        l.readChar()
+                        break</span>
+                }
+                <span class="cov8" title="1">if l.ch == 0 </span><span class="cov0" title="0">{
+                        break</span>
+                }
+                <span class="cov8" title="1">l.readChar()</span>
+        }
+        <span class="cov8" title="1">return l.input[start:l.pos]</span>
+}
+
+func (l *Lexer) readNumber() string <span class="cov8" title="1">{
+        start := l.pos
+        for isDigit(l.ch) </span><span class="cov8" title="1">{
+                l.readChar()
+        }</span>
+        <span class="cov8" title="1">return l.input[start:l.pos]</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">// Arquivo gerado para converter tokens em seus nomes
+package luanova
+
+// TokenName retorna o nome do token a partir do seu código
+func TokenName(tok int) string <span class="cov0" title="0">{
+        switch tok </span>{
+        case Illegal:<span class="cov0" title="0">
+                return "Illegal"</span>
+        case EOF:<span class="cov0" title="0">
+                return "EOF"</span>
+        case Comment:<span class="cov0" title="0">
+                return "Comment"</span>
+        case CommentBlock:<span class="cov0" title="0">
+                return "CommentBlock"</span>
+        case True:<span class="cov0" title="0">
+                return "True"</span>
+        case False:<span class="cov0" title="0">
+                return "False"</span>
+        case Literal:<span class="cov0" title="0">
+                return "Literal"</span>
+        case Function:<span class="cov0" title="0">
+                return "Function"</span>
+        case Local:<span class="cov0" title="0">
+                return "Local"</span>
+        case If:<span class="cov0" title="0">
+                return "If"</span>
+        case ElseIf:<span class="cov0" title="0">
+                return "ElseIf"</span>
+        case Else:<span class="cov0" title="0">
+                return "Else"</span>
+        case While:<span class="cov0" title="0">
+                return "While"</span>
+        case For:<span class="cov0" title="0">
+                return "For"</span>
+        case End:<span class="cov0" title="0">
+                return "End"</span>
+        case Then:<span class="cov0" title="0">
+                return "Then"</span>
+        case Repeat:<span class="cov0" title="0">
+                return "Repeat"</span>
+        case Continue:<span class="cov0" title="0">
+                return "Continue"</span>
+        case Break:<span class="cov0" title="0">
+                return "Break"</span>
+        case In:<span class="cov0" title="0">
+                return "In"</span>
+        case Return:<span class="cov0" title="0">
+                return "Return"</span>
+        case Do:<span class="cov0" title="0">
+                return "Do"</span>
+        case Not:<span class="cov0" title="0">
+                return "Not"</span>
+        case NotEqual:<span class="cov0" title="0">
+                return "NotEqual"</span>
+        case Or:<span class="cov0" title="0">
+                return "Or"</span>
+        case Greater:<span class="cov0" title="0">
+                return "Greater"</span>
+        case Less:<span class="cov0" title="0">
+                return "Less"</span>
+        case GreaterEqual:<span class="cov0" title="0">
+                return "GreaterEqual"</span>
+        case LessEqual:<span class="cov0" title="0">
+                return "LessEqual"</span>
+        case And:<span class="cov0" title="0">
+                return "And"</span>
+        case Assign:<span class="cov0" title="0">
+                return "Assign"</span>
+        case Equal:<span class="cov0" title="0">
+                return "Equal"</span>
+        case PlusAssign:<span class="cov0" title="0">
+                return "PlusAssign"</span>
+        case SubAssign:<span class="cov0" title="0">
+                return "SubAssign"</span>
+        case MultiAssign:<span class="cov0" title="0">
+                return "MultiAssign"</span>
+        case DivAssign:<span class="cov0" title="0">
+                return "DivAssign"</span>
+        case ModAssign:<span class="cov0" title="0">
+                return "ModAssign"</span>
+        case Declaration:<span class="cov0" title="0">
+                return "Declaration"</span>
+        case Plus:<span class="cov0" title="0">
+                return "Plus"</span>
+        case Sub:<span class="cov0" title="0">
+                return "Sub"</span>
+        case Multi:<span class="cov0" title="0">
+                return "Multi"</span>
+        case Div:<span class="cov0" title="0">
+                return "Div"</span>
+        case Mod:<span class="cov0" title="0">
+                return "Mod"</span>
+        case Po:<span class="cov0" title="0">
+                return "Po"</span>
+        case Concat:<span class="cov0" title="0">
+                return "Concat"</span>
+        case StringDelim:<span class="cov0" title="0">
+                return "StringDelim"</span>
+        case LParen:<span class="cov0" title="0">
+                return "LParen"</span>
+        case RParen:<span class="cov0" title="0">
+                return "RParen"</span>
+        case LBrace:<span class="cov0" title="0">
+                return "LBrace"</span>
+        case RBrace:<span class="cov0" title="0">
+                return "RBrace"</span>
+        case LBrack:<span class="cov0" title="0">
+                return "LBrack"</span>
+        case RBrack:<span class="cov0" title="0">
+                return "RBrack"</span>
+        case Comma:<span class="cov0" title="0">
+                return "Comma"</span>
+        case Semi:<span class="cov0" title="0">
+                return "Semi"</span>
+        case Colom:<span class="cov0" title="0">
+                return "Colom"</span>
+        case Dot:<span class="cov0" title="0">
+                return "Dot"</span>
+        case Dots:<span class="cov0" title="0">
+                return "Dots"</span>
+        case Arrow:<span class="cov0" title="0">
+                return "Arrow"</span>
+        case Question:<span class="cov0" title="0">
+                return "Question"</span>
+        case String:<span class="cov0" title="0">
+                return "String"</span>
+        case Int:<span class="cov0" title="0">
+                return "Int"</span>
+        case Bool:<span class="cov0" title="0">
+                return "Bool"</span>
+        case Float:<span class="cov0" title="0">
+                return "Float"</span>
+        default:<span class="cov0" title="0">
+                return "Unknown"</span>
+        }
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
