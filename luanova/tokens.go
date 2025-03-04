@@ -8,8 +8,10 @@ const (
 	Illegal = iota
 	EOF
 
-	Comment      // //
-	CommentBlock // /**/
+	Comment      //--
+	CommentBlock // -**-
+	True         // true
+	False        // false
 
 	Literal // Literal
 
@@ -56,22 +58,25 @@ const (
 	Concat       // ..
 
 	//Delimiters
-	LParen   // (
-	RParen   // )
-	LBrace   // {
-	RBrace   // }
-	LBrack   // [
-	RBrack   // ]
-	Comma    // ,
-	Semi     // ;
-	Colom    // :
-	Dot      // .
-	Dots     // ...
-	Arrow    // ->
-	Question // ?
+	StringDelim // "
+	LParen      // (
+	RParen      // )
+	LBrace      // {
+	RBrace      // }
+	LBrack      // [
+	RBrack      // ]
+	Comma       // ,
+	Semi        // ;
+	Colom       // :
+	Dot         // .
+	Dots        // ...
+	Arrow       // ->
+	Question    // ?
 
 	// Primitive Types
 	String // string
 	Int    // int
+	Bool   // bool
 	Float  // float
+
 )
